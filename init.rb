@@ -1,8 +1,7 @@
 Redmine::Plugin.register :redmine_contract_management do
+  settings default: {'empty' => true}, partial: 'redmine_contract_management/settings'
   name 'Redmine Contract Management plugin'
-  author 'Author name'
+  author 'Justyna Wojtczak'
   description 'This is a plugin for Redmine'
-  version '0.0.1'
-  url 'http://example.com/path/to/plugin'
-  author_url 'http://example.com/about'
+  version '0.0.2'
 end
