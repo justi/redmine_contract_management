@@ -1,8 +1,11 @@
 <p>
 	<% if Project.active.any? %>
 		<label><%= l(:contract_management_projects_list) %>:</label>
-	   	<%= select_tag 'settings[contract_management_project]',  options_for_select(Project.active.collect{ |u| [u.name, u.id] }, settings['contract_management_project']) %>
+	   	<%= select_tag 'settings[contract_management_project]',  options_for_select(Project.active.collect{ |u| [u.name, u.id] }, settings['contract_management_project']), { include_blank: true } %>
 	<% else %>
 	  	<%= link_to l(:contract_management_projects_add_new_project), projects_path %>
 	<% end %>
+	<span>
+	  (<%= l(:contract_management_projects_restart_required) %>)
+	</span>
 </p>

@@ -2,3 +2,4 @@
 en:
   contract_management_projects_list: Projects list
   contract_management_projects_add_new_project: Add a project first
+  contract_management_projects_restart_required: To apply changes in top menu restart the redmine

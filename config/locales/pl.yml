@@ -1,3 +1,4 @@
 pl:
   contract_management_projects_list: Projekt do zarządzania umowami
   contract_management_projects_add_new_project: Dodaj projekt do zarządzanie umowami
+  contract_management_projects_restart_required: Link w górnym menu będzie widoczny po restarcie redmine
