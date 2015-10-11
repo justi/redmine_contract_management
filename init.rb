@@ -1,3 +1,6 @@
+require 'redmine_contract_management/patches/issues_controller_patch'
+
+
 Redmine::Plugin.register :redmine_contract_management do
   settings default: {'empty' => true}, partial: 'redmine_contract_management/settings'
   name 'Redmine Contract Management plugin'
@@ -6,11 +9,6 @@ Redmine::Plugin.register :redmine_contract_management do
   version '0.0.2'
 
 end
-
-#config.to_prepare do
-  #Redmine::MenuManager.map(:admin_menu).delete(:groups) if Setting["plugin_redmine_blah"]["hide_groups_menu"]
-
-#end
 
 Rails.application.config.to_prepare do  
   project_id = Setting['plugin_redmine_contract_management']['contract_management_project']

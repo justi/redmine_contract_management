@@ -1,2 +1,1 @@
-# Plugin's routes
-# See: http://guides.rubyonrails.org/routing.html
+  match 'project_contract_management/new_issue' => 'issues#new_contract_issue', via: :post
