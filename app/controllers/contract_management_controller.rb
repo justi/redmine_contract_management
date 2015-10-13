@@ -9,8 +9,8 @@ class ContractManagementController < ApplicationController
   accept_api_auth :new_contract_issue
     
   def new_contract_issue
-    if @project_cm && (contract_data = params[:data])
-      build_contract_from_params(contract_data)
+    if @project_cm && params
+      build_contract_from_params(params)
       if @contract
         @contract.project = @project_cm
         # @contract.author ||= User.current
