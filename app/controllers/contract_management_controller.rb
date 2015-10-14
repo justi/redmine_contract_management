@@ -31,6 +31,12 @@ class ContractManagementController < ApplicationController
     end
 
     def serialize_contract_from_json(contract_data)
+    #{"process_name":"Nowe zlecenie do umowy", "Nazwa Partnera":"Netmachina","Typ umowy":"Ramowa","Numer umowy":"UR 1\/2013","Numer zlecenia":"001","Opis":"opisjest","Data realizacji":1446246000000,"Akceptacja b\u0142\u0119du":true}'
+      process_name = contract_data["process_name"]
+      if precess_name = "Dodanie nowej umowy z Partnerem"
+      elsif process_name == "Nowe zlecenie do umowy"
+      elsif process_name.include? "Zgłoszenie błędu"
+      end
       first_partner_name = contract_data["Nazwa Partnera"]
       first_partner_address = contract_data["Adres Partnera"]
       first_partner_nip_object = contract_data["NIP Partnera"]
@@ -70,4 +76,6 @@ class ContractManagementController < ApplicationController
       project_id = Setting['plugin_redmine_contract_management']['contract_management_project']
       @project_cm = Project.find_by_id(project_id)
     end
+
+
 end
