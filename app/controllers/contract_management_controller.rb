@@ -14,7 +14,7 @@ class ContractManagementController < ApplicationController
       if @contract
         @contract.project = @project_cm
         contract_partner = find_or_create_partner(params)
-        @contact.custom_field_values = { IssueCustomField.find_by_name("Contract partner").id => contract_partner.id} if contract_partner.present?
+        @contact.custom_field_values = { IssueCustomField.find_by_name("Partner umowy").id => contract_partner.id} if contract_partner.present?
         @contract.author = find_espeo_user
 
         process_name = contract_data["process_name"]
@@ -30,7 +30,13 @@ class ContractManagementController < ApplicationController
         end
 
         contract_number = contract_data["Numer Umowy"]
-        @contact.custom_field_values = { IssueCustomField.find_by_name("Contract number").id => contract_number}
+        @contact.custom_field_values = { IssueCustomField.find_by_name("Numer umowy / Contract number").id => contract_number}
+        
+        contract_type = contract_data["Typ umowy"]
+        if IssueCustomField.find_by_name("Typ umowy").possible_values.include? contract_type
+          @contact.custom_field_values = { IssueCustomField.find_by_name("Typ umowy").id => contract_type}
+        end
+
         @contract.start_date ||= Date.today if Setting.default_issue_start_date_to_creation_date?
       end
     end
