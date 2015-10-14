@@ -9,61 +9,65 @@ class ContractManagementController < ApplicationController
     
   def new_contract_issue
     if @project_cm && params
-      contract = Issue.new(project: @project_cm)
+      @contract = Issue.new(project: @project_cm)
+      
       contract_partner = find_or_create_partner(params)
-      contract.custom_field_values = { IssueCustomField.find_by_name("Partner umowy").id => contract_partner.id} if contract_partner.present?
-      contract.author = find_espeo_user
+      if contract_partner.present?
+        update_custom_field("Partner umowy", contract_partner.id)
+      end
+      @contract.author = find_espeo_user
 
       contract_subject = params["Opis"] || ("Umowa z " + contract_partner.first_name)
-      contract.subject = contract_subject
+      @contract.subject = contract_subject
 
       process_name = params["process_name"]
       trackers = @project_cm.trackers
-      tracker = if process_name == "Dodanie nowej umowy z Partnerem"
-                  trackers.find_by_name("Umowa")
-                elsif process_name == "Nowe zlecenie do umowy"
-                  trackers.find_by_name("Zlecenie")
-                elsif process_name.include? "Zgłoszenie błędu"
-                  trackers.find_by_name("Błąd")
-                end
-
-      contract.tracker = tracker
-
-      contract_number = params["Numer Umowy"]
-      contract.custom_field_values = { IssueCustomField.find_by_name("Numer umowy / Contract number").id => contract_number }
-        
-      contract_type = params["Typ umowy"]
-      if IssueCustomField.find_by_name("Typ umowy").possible_values.include? contract_type
-        contract.custom_field_values = { IssueCustomField.find_by_name("Typ umowy").id => contract_type }
+      if process_name == "Dodanie nowej umowy z Partnerem"
+        tracker = trackers.find_by_name("Umowa")
+        update_custom_field("Numer umowy / Contract number", params["Numer Umowy"])
+        update_custom_field("Link do umowy", params["Link do dokumentu"])
+        update_custom_field("Typ umowy", params["Typ umowy"])
+      elsif process_name == "Nowe zlecenie do umowy"
+        tracker = trackers.find_by_name("Zlecenie")
+        update_custom_field("Numer umowy / Contract number", params["Numer umowy"])
+        update_custom_field("Numer", params["Numer zlecenia"])
+        update_custom_field("Typ umowy", params["Typ umowy"])
+      elsif process_name.include? "Zgłoszenie błędu"
+        tracker = trackers.find_by_name("Błąd")
+        update_custom_field("Numer umowy / Contract number", params["Numer umowy"])
+        update_custom_field("Numer", params["Numer błędu"])
+        update_custom_field("Typ umowy", params["Typ umowa"])
       end
 
-      invoicing = params["Fakturowanie"]
-      if IssueCustomField.find_by_name("Fakturowanie").possible_values.include? invoicing
-        contract.custom_field_values = { IssueCustomField.find_by_name("Fakturowanie").id => invoicing }
-      end
-
+      @contract.tracker = tracker
+      
+      #update_custom_field("Fakturowanie", params["Fakturowanie"])
       start_ts = params["Początek umowy"]
-      contract.start_date = Time.at(start_ts).utc if start_ts.present?
+      @contract.start_date = Time.at(start_ts/1000).utc.to_date if start_ts.present?
 
       end_ts = params["Koniec umowy"]
-      contract.due_date = Time.at(end_ts).utc if end_ts.present?
-
-      contract_url = params["Link do dokumentu"]
-      contract.custom_field_values = { IssueCustomField.find_by_name("Link do umowy").id => contract_url }
-
-      error_number = params["Numer błędu"]
-      contract.custom_field_values = { IssueCustomField.find_by_name("Numer").id => error_number }
-    end
-    if contract.save
-    else
+      @contract.due_date = Time.at(end_ts/1000).utc.to_date if end_ts.present?
+    
+      if @contract.save
+        respond_to do |format|
+          format.json { render_api_ok }
+        end
+      else
+        render :json => { :errors => @contract.errors.full_messages }
+      end
     end
   end
 
-  private 
+  private
+
+    def update_custom_field(name, value)
+      cf = CustomFieldValue.new
+      cf.custom_field = IssueCustomField.find_by_name(name)
+      cf.value = value
+      @contract.custom_field_values << cf
+    end
 
     def serialize_contract_from_json(params)
-    #{"process_name":"Nowe zlecenie do umowy", "Nazwa Partnera":"Netmachina","Typ umowy":"Ramowa","Numer umowy":"UR 1\/2013","Numer zlecenia":"001","Opis":"opisjest","Data realizacji":1446246000000,"Akceptacja b\u0142\u0119du":true}'
-
       # second_partner_name = params["Podaj nazwę Drugiego Partnera"]
       # second_partner_address = params["Podaj adres drugiego Partnera"]
       # second_partner_nip_object = params["Podaj NIP drugiego Partnera"]
@@ -97,7 +101,6 @@ class ContractManagementController < ApplicationController
     def find_espeo_user
       User.find_by_firstname("justi")
       #User.find_by_firstname("Sylwia")
-
     end
 
     def find_or_create_partner(params)

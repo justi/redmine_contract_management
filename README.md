@@ -27,7 +27,7 @@ Redmine settings
    - Kontrakt Projektowy
    - Kontrakt Zespół
    - Umowa jednorazowa
-   - Urzymaniowa
+   - Umowa utrzymaniowa
   - "Fakturowanie" as a list with positions:
    - Tygodniowe ( Monthly)
    - Miesięczne (Weekly)
