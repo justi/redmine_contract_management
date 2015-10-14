@@ -16,6 +16,7 @@ class ContractManagementController < ApplicationController
         update_custom_field("Partner umowy", contract_partner.id)
       end
       @contract.author = find_espeo_user
+      @contract.assigned_to_id = @contract.author.id
 
       contract_subject = params["Opis"] || ("Umowa z " + contract_partner.first_name)
       @contract.subject = contract_subject
@@ -99,8 +100,8 @@ class ContractManagementController < ApplicationController
     end
 
     def find_espeo_user
-      User.find_by_firstname("justi")
-      #User.find_by_firstname("Sylwia")
+      #User.find_by_firstname("justi")
+      User.find_by_firstname("Sylwia")
     end
 
     def find_or_create_partner(params)
