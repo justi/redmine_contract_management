@@ -109,8 +109,13 @@ class ContractManagementController < ApplicationController
       contact = Contact.by_project(@project_cm).find_by_first_name(partner_name)
       unless contact.present?
         contact = Contact.new(project: @project_cm, first_name: partner_name)
-        nip_number = params["NIP Partnera"] || "brak"
-        contact.custom_field_values = { ContactCustomField.find_by_name("Company nip number").id => nip_number}
+        if ContactCustomField.find_by_name("Company nip number")
+          cf = CustomFieldValue.new
+          cf.custom_field = ContactCustomField.find_by_name("Company nip number")
+          nip_number = params["NIP Partnera"] || "brak"
+          cf.value = nip_number
+          contact.custom_field_values << cf
+        end
         contact.is_company = true
         first_partner_address = params["Adres Partnera"]
         if first_partner_address.present?
