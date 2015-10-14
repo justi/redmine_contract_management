@@ -17,8 +17,10 @@ Installation Steps
 Redmine settings
 ----------------
  - Go to "Administration -> Plugins" and setup plugin global settings. Make sure the contract management project exists. Changes in main menu require restarting redmine.
- - For project that choosen in previous step, create a new trackers - "Umowa" and "Zlecenie"
- - For that project create also custom fields for handle "Umowa" and "Zlecenie".
+ - For project that choosen in previous step, create a new trackers - "Umowa", "Zlecenie" and "Błąd".
+ - For that project create also custom fields for "Issue" for handle trackers listed above:
+  - "Contract partner" as Company(Contact) type and mark them as required
+  - "Contract number" as Text type and mark them as required
  - To enable the API-style authentication, you have to check Enable REST API in Administration -> Settings -> Authentication
  - You can find your API key on your account page ( /my/account ) when logged in, on the right-hand pane of the default layout
 
