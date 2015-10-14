@@ -13,6 +13,7 @@ class ContractManagementController < ApplicationController
       build_contract_from_params(params)
       if @contract
         @contract.project = @project_cm
+        @contract.partner = find_or_create_partner(params)
         # @contract.author ||= User.current
         # @contract.tracker ||= @project.trackers.find((params[:issue] && params[:issue][:tracker_id]) || params[:tracker_id] || :first)
         # @contract.start_date ||= Date.today if Setting.default_issue_start_date_to_creation_date?
@@ -37,9 +38,6 @@ class ContractManagementController < ApplicationController
       elsif process_name == "Nowe zlecenie do umowy"
       elsif process_name.include? "Zgłoszenie błędu"
       end
-      first_partner_name = contract_data["Nazwa Partnera"]
-      first_partner_address = contract_data["Adres Partnera"]
-      first_partner_nip_object = contract_data["NIP Partnera"]
 
       second_partner_name = contract_data["Podaj nazwę Drugiego Partnera"]
       second_partner_address = contract_data["Podaj adres drugiego Partnera"]
@@ -77,5 +75,21 @@ class ContractManagementController < ApplicationController
       @project_cm = Project.find_by_id(project_id)
     end
 
+    def find_or_create_partner(contract_data)
+      partner_name = contract_data["Nazwa Partnera"]
+      contact = Contact.by_project(@project_cm).find_by_first_name(partner_name)
+      unless contact.present?
+        contact = Contact.new(project: @project_cm, first_name: partner_name)
+        contact.custom_field_values = { ContactCustomField.find_by_name("Company nip number").id => contract_data["NIP Partnera"]}
 
+        first_partner_address = contract_data["Adres Partnera"]
+        if first_partner_address.present?
+          address = Address.new(full_address: first_partner_address)
+          address.save
+          contact.address = address
+        end
+        contact.save
+      end
+      contact
+    end
 end
