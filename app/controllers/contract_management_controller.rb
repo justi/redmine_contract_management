@@ -28,26 +28,31 @@ class ContractManagementController < ApplicationController
         update_custom_field("Numer umowy / Contract number", params["Numer Umowy"])
         update_custom_field("Link do umowy", params["Link do dokumentu"])
         update_custom_field("Typ umowy", params["Typ umowy"])
+        start_ts = params["Początek umowy"]
+        @contract.start_date = Time.at(start_ts/1000).utc.to_date if start_ts.present?
+        end_ts = params["Koniec umowy"]
+        @contract.due_date = Time.at(end_ts/1000).utc.to_date if end_ts.present?
       elsif process_name == "Nowe zlecenie do umowy"
         tracker = trackers.find_by_name("Zlecenie")
         update_custom_field("Numer umowy / Contract number", params["Numer umowy"])
         update_custom_field("Numer", params["Numer zlecenia"])
         update_custom_field("Typ umowy", params["Typ umowy"])
+        @contract.start_date = Time.now.utc.to_date
+        end_ts = params["Data realizacji"]
+        @contract.due_date = Time.at(end_ts/1000).utc.to_date if end_ts.present?
       elsif process_name.include? "Zgłoszenie błędu"
         tracker = trackers.find_by_name("Błąd")
         update_custom_field("Numer umowy / Contract number", params["Numer umowy"])
         update_custom_field("Numer", params["Numer błędu"])
         update_custom_field("Typ umowy", params["Typ umowa"])
+        @contract.start_date = Time.now.utc.to_date
+        end_ts = params["Data realizacji"]
+        @contract.due_date = Time.at(end_ts/1000).utc.to_date if end_ts.present?
       end
 
       @contract.tracker = tracker
       
       #update_custom_field("Fakturowanie", params["Fakturowanie"])
-      start_ts = params["Początek umowy"]
-      @contract.start_date = Time.at(start_ts/1000).utc.to_date if start_ts.present?
-
-      end_ts = params["Koniec umowy"]
-      @contract.due_date = Time.at(end_ts/1000).utc.to_date if end_ts.present?
     
       if @contract.save
         respond_to do |format|
